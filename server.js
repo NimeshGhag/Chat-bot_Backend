@@ -6,11 +6,14 @@ const port = process.env.PORT;
 const { createServer } = require("http");
 const { Server } = require("socket.io");
 const generateResponse = require("./src/services/ai.service");
+const { text } = require("stream/consumers");
 
 const httpServer = createServer(app);
 const io = new Server(httpServer, {
   /* options */
 });
+
+const chatHistory =[]
 
 io.on("connection", (socket) => {
   console.log("A user is connected");
@@ -19,7 +22,15 @@ io.on("connection", (socket) => {
   });
 
   socket.on("ai-message", async (data) => {
-    const responce = await generateResponse(data.prompt);
+    chatHistory.push({
+        role:"user",
+        parts:[{text:data.prompt}]
+    })
+    const responce = await generateResponse(chatHistory);
+    chatHistory.push({
+        role:"model",
+        parts:[{text:responce}]
+    })
     socket.emit("ai-message-responce", { responce });
   });
 });
