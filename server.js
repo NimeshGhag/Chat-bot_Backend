@@ -6,11 +6,13 @@ const port = process.env.PORT;
 const { createServer } = require("http");
 const { Server } = require("socket.io");
 const generateResponse = require("./src/services/ai.service");
-const { text } = require("stream/consumers");
+
 
 const httpServer = createServer(app);
 const io = new Server(httpServer, {
-  /* options */
+  cors:{
+    origin: "http://localhost:5174",
+  }
 });
 
 const chatHistory =[]
